@@ -5,16 +5,22 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 <MudLayout>
+    <!-- App Bar -->
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
-        <MudSpacer/>
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+        <MudText Typo="Typo.h5" Class="ml-3">VoidForge</MudText>
+        <!-- Navigation Links in the App Bar -->
+        <MudNavMenu Class="d-flex align-left">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Class="pa-3">Home</MudNavLink>
+            <MudNavLink Href="/about" Class="pa-3">About</MudNavLink>
+            <MudNavLink Href="/contact" Class="pa-3">Contact</MudNavLink>
+        </MudNavMenu>
+        <MudSpacer />
+        <!-- Theme Toggle and Options -->
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu/>
-    </MudDrawer>
+
+    <!-- Main Content -->
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
