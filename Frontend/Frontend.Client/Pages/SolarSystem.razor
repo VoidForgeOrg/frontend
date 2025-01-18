@@ -1,0 +1,42 @@
+﻿@page "/SolarSystem/{id:int}"
+<h3>System</h3>
+<MudGrid>
+    <MudItem xs="3">
+        <MudPaper Height="90vh" Class="d-flex flex-column align-start justify-start mud-width-full blue- py-1">
+            <!-- cards with planet things... TBD -->
+            <MudCard Outlined="true" Class="mud-width-full">
+                <MudCardActions Class="mud-width-full mx-auto">
+                    <MudButton Class="mud-width-full" Variant="Variant.Text" Color="Color.Primary" Href="/Sectors">
+                        Resources
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudPaper>
+    </MudItem>
+
+
+    <MudItem xs="6">
+        <MudPaper Height="90vh" Class="d-flex align-start justify-start mud-width-full">
+            <MudImage Fluid="true" Src="images/GalaxyMap.webp" Alt="Galaxy Map"
+                      Style="object-fit: cover; width: 100%; height: 100%;"/>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="3">
+        <MudPaper Height="90vh" Class="d-flex flex-column align-start justify-start mud-width-full py-1">
+            @foreach (var planet in _planets)
+            {
+                <MudCard Outlined="true" Class="mud-width-full">
+                    <MudCardActions Class="mud-width-full mx-auto">
+                        <MudButton Class="mud-width-full" Variant="Variant.Text" Color="Color.Primary" Href="/Sectors">
+                            @planet
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+@code {
+    [Parameter] public int id { get; set; }
+    private List<String> _planets = ["Mars", "Terra", "Europa", "Phobos", "Deimos"];
+}

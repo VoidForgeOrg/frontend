@@ -2,6 +2,6 @@
 
 namespace Frontend.Client.Pages;
 
-public partial class System : ComponentBase
+public partial class SolarSystem : ComponentBase
 {
 }
