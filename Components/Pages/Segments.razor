@@ -1,4 +1,4 @@
-﻿@page "/Sectors"
+﻿@page "/Segments"
 @inject NavigationManager NavigationManager
 <MudGrid>
     <MudItem xs="3">
@@ -24,13 +24,15 @@
         </MudPaper>
     </MudItem>
     <MudItem xs="3">
+        <p>@Test</p>
         <MudPaper Height="90vh" Class="d-flex flex-column align-start justify-start mud-width-full py-1">
-            @foreach (var system in _systems)
+            @GetSegments()
+            @foreach (var planet in Entities)
             {
                 <MudCard Outlined="true" Class="mud-width-full">
                     <MudCardActions Class="mud-width-full mx-auto">
                         <MudButton Class="mud-width-full" Variant="Variant.Text" Color="Color.Primary" Href="/Sectors">
-                            @system
+                            @planet.Name
                         </MudButton>
                     </MudCardActions>
                 </MudCard>
@@ -48,6 +50,6 @@
     //will need injectable service for sectors & planets
     private void NavigateToSystem(int systemId)
     {
-        NavigationManager.NavigateTo($"/systems/{systemId}");
+        NavigationManager.NavigateTo($"/SolarSystems/{systemId}");
     }
 }
