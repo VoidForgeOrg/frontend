@@ -1,17 +1,23 @@
 import './App.css'
 import {
     AppBar,
-    Avatar,
-    Box, Card, CardContent,
+    Avatar, Box,
     createTheme,
-    IconButton, List,
-    ListItem, ListItemButton, ListItemText,
+    List,
+    ListItem, ListItemButton, ListItemIcon, ListItemText,
     Stack,
     ThemeProvider,
     Toolbar,
     Typography
 } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
+import Welcome from "./components/welcome/Welcome.tsx";
+import {useState} from "react";
+import PlanetsMenu from "./components/planets/PlanetsMenu.tsx";
+
+import PublicIcon from '@mui/icons-material/Public';
+import BiotechIcon from '@mui/icons-material/Biotech';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 
 const darkTheme = createTheme({
     palette: {
@@ -19,87 +25,71 @@ const darkTheme = createTheme({
     },
 });
 
-import { useTheme, useMediaQuery } from '@mui/material';
-
 function App() {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
     return (
         <ThemeProvider theme={darkTheme}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+
+            <Stack spacing={2}>
                 <AppBar position="static">
-                    <Toolbar sx={{ justifyContent: 'space-between' }}>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
+                    <Toolbar sx={{justifyContent: 'space-between'}}>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar />
-                            <Typography variant="h6" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            <Avatar/>
+                            <Typography variant="h6">
                                 Unknown
                             </Typography>
                         </Stack>
                     </Toolbar>
                 </AppBar>
 
-                <Box sx={{
-                    display: 'flex',
-                    flexGrow: 1,
-                    flexDirection: { xs: 'column', md: 'row' },
-                    gap: 4,
-                    p: 2
-                }}>
-                    <List sx={{
-                        width: { xs: '100%', md: 240 },
-                        display: { xs: isMobile ? 'none' : 'block', md: 'block' }
-                    }}>
-                        {['Sectors', 'Exploration', 'Colonization', 'Trade'].map((text) => (
-                            <ListItem disablePadding key={text}>
-                                <ListItemButton>
-                                    <ListItemText primary={text} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                <Stack direction="row" spacing={2}>
+                    <List>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 1} onClick={() => setSelectedIndex(1)}>
+                                <ListItemIcon>
+                                    <PublicIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Planets"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 2} onClick={() => setSelectedIndex(2)}>
+                                <ListItemIcon>
+                                    <BiotechIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Research (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 3} onClick={() => setSelectedIndex(3)}>
+                                <ListItemIcon>
+                                    <RocketLaunchIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Fleet (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 4} onClick={() => setSelectedIndex(4)}>
+                                <ListItemIcon>
+                                    <SatelliteAltIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Exploration (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
                     </List>
 
-                    <Card sx={{
-                        flexGrow: 1,
-                        minWidth: 300,
-                        maxWidth: 1200,
-                        mx: 'auto'
-                    }}>
-                        <CardContent>
-                            <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
-                                Welcome to the VoidForge
-                            </Typography>
-                            <Typography variant="body1">
-                                This will be the main screen you interact with
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <Box>
+                        {selectedIndex === 0 && <Welcome/>}
+                        {selectedIndex === 1 && <PlanetsMenu/>}
+                    </Box>
+                </Stack>
+            </Stack>
 
-                    <List sx={{
-                        width: { xs: '100%', md: 240 },
-                        display: { xs: isMobile ? 'none' : 'block', md: 'block' }
-                    }}>
-                        {['Research', 'Fleet', 'Empire', 'Settings'].map((text) => (
-                            <ListItem disablePadding key={text}>
-                                <ListItemButton>
-                                    <ListItemText primary={text} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
-            </Box>
+
         </ThemeProvider>
     )
 }
-
 
 export default App
