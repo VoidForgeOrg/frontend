@@ -1,11 +1,11 @@
 import './App.css'
 import {
-    AppBar,
-    Avatar, Box,
+    AppBar, Avatar,
+    Box, Button,
     createTheme,
     CSSObject, IconButton,
     List,
-    ListItem, ListItemButton, ListItemIcon, ListItemText,
+    ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem,
     Stack, styled,
     Theme,
     ThemeProvider,
@@ -23,6 +23,8 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import MenuIcon from '@mui/icons-material/Menu';
+import {useAuth} from "react-oidc-context";
+import * as React from "react";
 
 const darkTheme = createTheme({
     palette: {
@@ -73,8 +75,39 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 function App() {
 
+    const auth = useAuth();
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+
+    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    switch (auth.activeNavigator) {
+        case "signinSilent":
+            return <div>Signing you in...</div>;
+        case "signoutRedirect":
+            return <div>Signing you out...</div>;
+    }
+
+    if (auth.isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (auth.error) {
+        return <div>Oops... {auth.error.message}</div>;
+    }
+
+
+    if (!auth.isAuthenticated) {
+        return <button onClick={() => void auth.signinRedirect()}>Log in</button>
+    }
 
     return (
         <ThemeProvider theme={darkTheme}>
@@ -92,10 +125,31 @@ function App() {
                             <MenuIcon/>
                         </IconButton>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar/>
-                            <Typography variant="h6">
-                                Unknown
-                            </Typography>
+                            <Button onClick={handleMenu}>
+                                <Avatar />
+                                <Typography variant="h6">
+                                    {auth.user?.profile.name}
+                                </Typography>
+                            </Button>
+                            <Menu
+                                id="user-menu"
+                                anchorEl={anchorEl}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                                >
+                                <MenuItem onClick={() => {
+                                    void auth.removeUser()
+                                }}>Logout</MenuItem>
+                            </Menu>
                         </Stack>
                     </Toolbar>
                 </AppBar>
