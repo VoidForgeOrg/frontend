@@ -1,5 +1,6 @@
-import {Card, Divider, Stack, TextField} from "@mui/material";
+import {Divider, Stack, TextField} from "@mui/material";
 import Grid from "@mui/material/Grid2"
+import PlanetCard from "./planetCard/PlanetCard.tsx";
 
 const PlanetsMenu = () => {
 
@@ -12,15 +13,13 @@ const PlanetsMenu = () => {
             </Stack>
             <Divider/>
             <Grid container spacing={2}>
-                <Card>
-                    Planet
-                </Card>
-                <Card>
-                    Planet
-                </Card>
-                <Card>
-                    Planet
-                </Card>
+                <PlanetCard planet={{name: "Earth"}}/>
+                <PlanetCard planet={{name: "Mars"}}/>
+                <PlanetCard planet={{name: "Jupiter"}}/>
+                <PlanetCard planet={{name: "Saturn"}}/>
+                <PlanetCard planet={{name: "Uranus"}}/>
+                <PlanetCard planet={{name: "Neptune"}}/>
+                <PlanetCard planet={{name: "Pluto"}}/>
             </Grid>
         </Stack>
     )
