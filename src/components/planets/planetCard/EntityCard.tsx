@@ -1,17 +1,13 @@
 // mockup type
 import {Card, CardActionArea, CardContent, CardMedia, Typography} from "@mui/material";
 import planetImage from "./planet.jpg";
+import {Entity} from "../PlanetsMenu.tsx";
 
-type Planet = {
-    name: string;
+type EntityCardProps = {
+    entity: Entity;
 }
 
-
-type PlanetCardProps = {
-    planet: Planet;
-}
-
-const PlanetCard = ({planet}: PlanetCardProps) => {
+const EntityCard = ({entity}: EntityCardProps) => {
     return (
         <Card sx={{ width: 245 }} >
             <CardActionArea>
@@ -21,7 +17,7 @@ const PlanetCard = ({planet}: PlanetCardProps) => {
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        {planet.name}
+                        {entity.name}
                     </Typography>
                 </CardContent>
             </CardActionArea>
@@ -29,4 +25,4 @@ const PlanetCard = ({planet}: PlanetCardProps) => {
     )
 }
 
-export default PlanetCard
+export default EntityCard
