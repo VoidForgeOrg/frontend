@@ -6,13 +6,12 @@ import {
     CSSObject, IconButton,
     List,
     ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem,
-    Stack, styled,
+    styled,
     Theme,
     ThemeProvider,
     Toolbar,
     Typography
 } from "@mui/material";
-import Welcome from "./components/welcome/Welcome.tsx";
 import {useState} from "react";
 import PlanetsMenu from "./components/planets/PlanetsMenu.tsx";
 
@@ -25,6 +24,7 @@ import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useAuth} from "react-oidc-context";
 import * as React from "react";
+import {MenuOpen} from "@mui/icons-material";
 
 const darkTheme = createTheme({
     palette: {
@@ -73,6 +73,19 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 );
 
 
+type menuItem = {
+    name: string,
+    icon: React.ElementType
+}
+
+const menuItems: menuItem[] = [
+    {name: "Planets", icon: PublicIcon},
+    {name: "Research", icon: BiotechIcon},
+    {name: "Fleet", icon: RocketLaunchIcon},
+    {name: "Exploration", icon: SatelliteAltIcon},
+]
+
+
 function App() {
 
     const auth = useAuth();
@@ -112,22 +125,24 @@ function App() {
     return (
         <ThemeProvider theme={darkTheme}>
 
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{display: 'flex', minHeight: '100vh'}}>
                 <CssBaseline/>
-                <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                     <Toolbar>
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
                             edge="start"
                             size="large"
+                            sx={{mr: 2}}
                             onClick={() => setOpen(!open)}
                         >
-                            <MenuIcon/>
+                            {open ? <MenuOpen/> : <MenuIcon/>}
                         </IconButton>
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                            <Button onClick={handleMenu}>
-                                <Avatar />
+                        <div style={{flexGrow: 1}}/>
+                        <Box>
+                            <Button onClick={handleMenu} sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                <Avatar/>
                                 <Typography variant="h6">
                                     {auth.user?.profile.name}
                                 </Typography>
@@ -146,60 +161,39 @@ function App() {
                                 }}
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
-                                >
+                            >
                                 <MenuItem onClick={() => {
                                     void auth.removeUser()
                                 }}>Logout</MenuItem>
                             </Menu>
-                        </Stack>
+                        </Box>
                     </Toolbar>
                 </AppBar>
                 <Drawer variant="permanent" open={open}>
                     <Toolbar/>
                     <List>
-                        <ListItem disablePadding>
-                            <ListItemButton selected={selectedIndex === 1} onClick={() => setSelectedIndex(1)}>
-                                <ListItemIcon>
-                                    <PublicIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={"Planets"}/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton selected={selectedIndex === 2} onClick={() => setSelectedIndex(2)}>
-                                <ListItemIcon>
-                                    <BiotechIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={"Research (Coming soon)"}/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton selected={selectedIndex === 3} onClick={() => setSelectedIndex(3)}>
-                                <ListItemIcon>
-                                    <RocketLaunchIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={"Fleet (Coming soon)"}/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton selected={selectedIndex === 4} onClick={() => setSelectedIndex(4)}>
-                                <ListItemIcon>
-                                    <SatelliteAltIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={"Exploration (Coming soon)"}/>
-                            </ListItemButton>
-                        </ListItem>
+                        {menuItems.map((item, index) => (
+                            <ListItem disablePadding sx={{display: 'block'}} key={item.name}>
+                                <ListItemButton selected={selectedIndex === index}
+                                                onClick={() => setSelectedIndex(index)} sx={[{
+                                    minHeight: 48,
+                                    px: 2.5
+                                }, open ? {justifyContent: 'initial'} : {justifyContent: 'center'}]}>
+                                    <ListItemIcon
+                                        sx={[{minWidth: 0, justifyContent: 'center'}, open ? {mr: 3} : {mr: 'auto'}]}>
+                                        <item.icon/>
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.name} sx={[open ? {opacity: 1} : {opacity: 0}]}/>
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
                     </List>
                 </Drawer>
 
-                <Stack direction="row" spacing={2}>
-
-
-                    <Box>
-                        {selectedIndex === 0 && <Welcome/>}
-                        {selectedIndex === 1 && <PlanetsMenu/>}
-                    </Box>
-                </Stack>
+                <Box component="main" sx={{flexGrow: 1, p: 3}}>
+                    <Toolbar/>
+                    {selectedIndex === 0 && <PlanetsMenu/>}
+                </Box>
             </Box>
 
 
