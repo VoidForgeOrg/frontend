@@ -25,6 +25,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {useAuth} from "react-oidc-context";
 import * as React from "react";
 import {MenuOpen} from "@mui/icons-material";
+import ComingSoon from "./components/welcome/ComingSoon.tsx";
 
 const darkTheme = createTheme({
     palette: {
@@ -75,14 +76,15 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 type menuItem = {
     name: string,
-    icon: React.ElementType
+    icon: React.ElementType,
+    component: React.ComponentType
 }
 
 const menuItems: menuItem[] = [
-    {name: "Planets", icon: PublicIcon},
-    {name: "Research", icon: BiotechIcon},
-    {name: "Fleet", icon: RocketLaunchIcon},
-    {name: "Exploration", icon: SatelliteAltIcon},
+    {name: "Planets", icon: PublicIcon, component: PlanetsMenu},
+    {name: "Research", icon: BiotechIcon, component: ComingSoon},
+    {name: "Fleet", icon: RocketLaunchIcon, component: ComingSoon},
+    {name: "Exploration", icon: SatelliteAltIcon, component: ComingSoon},
 ]
 
 
@@ -139,11 +141,11 @@ function App() {
                         >
                             {open ? <MenuOpen/> : <MenuIcon/>}
                         </IconButton>
-                        <div style={{flexGrow: 1}}/>
+                        <Typography style={{flexGrow: 1}} variant="h6">VoidForge</Typography>
                         <Box>
                             <Button onClick={handleMenu} sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                 <Avatar/>
-                                <Typography variant="h6">
+                                <Typography variant="button">
                                     {auth.user?.profile.name}
                                 </Typography>
                             </Button>
@@ -192,7 +194,10 @@ function App() {
 
                 <Box component="main" sx={{flexGrow: 1, p: 3}}>
                     <Toolbar/>
-                    {selectedIndex === 0 && <PlanetsMenu/>}
+                    {(() => {
+                        const Component = menuItems[selectedIndex]?.component;
+                        return Component ? <Component/> : <Typography>Error</Typography>
+                    })()}
                 </Box>
             </Box>
 
