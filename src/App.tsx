@@ -2,7 +2,7 @@ import './App.css'
 import {
     AppBar, Avatar,
     Box, Button,
-    createTheme,
+    createTheme, CssBaseline,
     CSSObject, IconButton,
     List,
     ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem,
@@ -112,8 +112,9 @@ function App() {
     return (
         <ThemeProvider theme={darkTheme}>
 
-            <Stack spacing={2}>
-                <AppBar position="static">
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline/>
+                <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                     <Toolbar>
                         <IconButton
                             color="inherit"
@@ -153,51 +154,53 @@ function App() {
                         </Stack>
                     </Toolbar>
                 </AppBar>
+                <Drawer variant="permanent" open={open}>
+                    <Toolbar/>
+                    <List>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 1} onClick={() => setSelectedIndex(1)}>
+                                <ListItemIcon>
+                                    <PublicIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Planets"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 2} onClick={() => setSelectedIndex(2)}>
+                                <ListItemIcon>
+                                    <BiotechIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Research (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 3} onClick={() => setSelectedIndex(3)}>
+                                <ListItemIcon>
+                                    <RocketLaunchIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Fleet (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton selected={selectedIndex === 4} onClick={() => setSelectedIndex(4)}>
+                                <ListItemIcon>
+                                    <SatelliteAltIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Exploration (Coming soon)"}/>
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </Drawer>
 
                 <Stack direction="row" spacing={2}>
-                    <Drawer variant="permanent" open={open}>
-                        <List>
-                            <ListItem disablePadding>
-                                <ListItemButton selected={selectedIndex === 1} onClick={() => setSelectedIndex(1)}>
-                                    <ListItemIcon>
-                                        <PublicIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={"Planets"}/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton selected={selectedIndex === 2} onClick={() => setSelectedIndex(2)}>
-                                    <ListItemIcon>
-                                        <BiotechIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={"Research (Coming soon)"}/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton selected={selectedIndex === 3} onClick={() => setSelectedIndex(3)}>
-                                    <ListItemIcon>
-                                        <RocketLaunchIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={"Fleet (Coming soon)"}/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton selected={selectedIndex === 4} onClick={() => setSelectedIndex(4)}>
-                                    <ListItemIcon>
-                                        <SatelliteAltIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={"Exploration (Coming soon)"}/>
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </Drawer>
+
 
                     <Box>
                         {selectedIndex === 0 && <Welcome/>}
                         {selectedIndex === 1 && <PlanetsMenu/>}
                     </Box>
                 </Stack>
-            </Stack>
+            </Box>
 
 
         </ThemeProvider>
