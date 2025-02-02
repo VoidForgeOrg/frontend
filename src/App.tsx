@@ -77,14 +77,13 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 type menuItem = {
     name: string,
     icon: React.ElementType,
-    component: React.ComponentType
 }
 
 const menuItems: menuItem[] = [
-    {name: "Planets", icon: PublicIcon, component: PlanetsMenu},
-    {name: "Research", icon: BiotechIcon, component: ComingSoon},
-    {name: "Fleet", icon: RocketLaunchIcon, component: ComingSoon},
-    {name: "Exploration", icon: SatelliteAltIcon, component: ComingSoon},
+    {name: "Planets", icon: PublicIcon},
+    {name: "Research", icon: BiotechIcon},
+    {name: "Fleet", icon: RocketLaunchIcon},
+    {name: "Exploration", icon: SatelliteAltIcon},
 ]
 
 
@@ -123,6 +122,8 @@ function App() {
     if (!auth.isAuthenticated) {
         return <button onClick={() => void auth.signinRedirect()}>Log in</button>
     }
+
+    console.log(auth.user?.profile.sub)
 
     return (
         <ThemeProvider theme={darkTheme}>
@@ -194,10 +195,10 @@ function App() {
 
                 <Box component="main" sx={{flexGrow: 1, p: 3}}>
                     <Toolbar/>
-                    {(() => {
-                        const Component = menuItems[selectedIndex]?.component;
-                        return Component ? <Component/> : <Typography>Error</Typography>
-                    })()}
+                    {selectedIndex === 0 && <PlanetsMenu playerSub={auth.user!.profile.sub}/>}
+                    {selectedIndex === 1 && <ComingSoon/>}
+                    {selectedIndex === 2 && <ComingSoon/>}
+                    {selectedIndex === 3 && <ComingSoon/>}
                 </Box>
             </Box>
 

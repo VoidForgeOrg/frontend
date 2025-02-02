@@ -1,62 +1,71 @@
 import {Autocomplete, Button, Checkbox, Divider, Stack, TextField} from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import EntityCard from "./planetCard/EntityCard.tsx";
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import SearchIcon from '@mui/icons-material/Search';
-
-type Segment = {
-    name: string;
-}
-
-type SolarSystem = {
-    name: string;
-    segment: Segment;
-}
-
-export type Entity = {
-    name: string;
-    solarSystem: SolarSystem;
-}
-
-const segments: Segment[] = [
-    {name: "Terran"},
-    {name: "Arkhanis"},
-]
-
-const solarSystems: SolarSystem[] = [
-    {name: "Sol", segment: segments[0]},
-    {name: "Khar", segment: segments[0]},
-    {name: "Tatoo", segment: segments[1]},
-]
-
-const planets: Entity[] = [
-    {name: "Earth", solarSystem: solarSystems[0]},
-    {name: "Mars", solarSystem: solarSystems[0]},
-    {name: "Azeroth", solarSystem: solarSystems[1]},
-    {name: "Tatooine", solarSystem: solarSystems[2]},
-]
+import useEntityStore from "../../stores/entityStore.ts";
+import useSegmentStore from "../../stores/segmentsStore.ts";
+import useSolarSystemStore from "../../stores/solarSystemStore.ts";
+import {getSegmentById, getSegmentBySolarSystemId, getSolarSystemById} from "../../utils/universeHelpers.ts";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small"/>;
 const checkedIcon = <CheckBoxIcon fontSize="small"/>;
 
-const PlanetsMenu = () => {
+type PlanetsMenuProps = {
+    playerSub: string;
+}
+
+
+const PlanetsMenu = (props: PlanetsMenuProps) => {
+
+
+    const fetchEntities = useEntityStore(state => state.fetchEntities);
+    const planets = useEntityStore(state => state.entities);
+    const segments = useSegmentStore(state => state.segments);
+    const solarSystems = useSolarSystemStore(state => state.solarSystems);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
 
-    const filteredPlanets = planets.filter(planet => {
-        return planet.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (selectedSegments.length === 0 || selectedSegments.includes(planet.solarSystem.segment.name)) &&
-            (selectedSolarSystems.length === 0 || selectedSolarSystems.includes(planet.solarSystem.name));
-    });
+    useEffect(() => {
+        fetchEntities("");
+    }, [fetchEntities, props.playerSub]);
 
-    const filteredSolarSystems = solarSystems.filter(solarSystem => {
-        return selectedSegments.length === 0 || selectedSegments.includes(solarSystem.segment.name);
-    });
+
+    const filteredPlanets = useMemo(() =>
+            planets.filter(planet => {
+                const solarSystem = planet.solarSystemId
+                    ? getSolarSystemById(solarSystems, planet.solarSystemId)
+                    : undefined;
+                console.log("Getting solar system for planet: " + planet.name + " and got: " + solarSystem);
+                const segment = solarSystem?.segmentId
+                    ? getSegmentById(segments, solarSystem.segmentId)
+                    : undefined;
+                console.log("Getting segment for planet: " + planet.name + " and got: " + segment);
+                // Check if current planet matches all filters
+                const matchesSearch = planet.name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false;
+                const matchesSegments = selectedSegments.length === 0
+                    || (segment?.name && selectedSegments.includes(segment.name));
+                const matchesSolarSystems = selectedSolarSystems.length === 0
+                    || (solarSystem?.name && selectedSolarSystems.includes(solarSystem.name));
+
+                return matchesSearch && matchesSegments && matchesSolarSystems;
+            }),
+        [planets, searchTerm, segments, selectedSegments, selectedSolarSystems, solarSystems]);
+
+
+    const filteredSolarSystems = useMemo(() =>
+            solarSystems.filter(solarSystem => {
+                const segment = getSegmentById(segments, solarSystem.segmentId!);
+                console.log("Getting segment for solar system: " + solarSystem.name + " and got: " + segment);
+                return selectedSegments.length === 0 || selectedSegments.includes(segment!.name!);
+            }),
+        [segments, selectedSegments, solarSystems]
+    );
 
     return (
         <Stack spacing={2}>
@@ -68,7 +77,7 @@ const PlanetsMenu = () => {
                               options={segments}
                               disableCloseOnSelect
                               limitTags={2}
-                              getOptionLabel={(option) => option.name}
+                              getOptionLabel={(option) => option.name!}
                               renderOption={(props, option, {selected}) => {
                                   const {key, ...optionProps} = props;
                                   return (
@@ -79,12 +88,12 @@ const PlanetsMenu = () => {
                                               style={{marginRight: 8}}
                                               checked={selected}
                                           />
-                                          {option.name}
+                                          {option.name!}
                                       </li>
                                   )
                               }}
                               style={{width: 325}}
-                              onChange={(_e, value) => setSelectedSegments(value.map(segment => segment.name))}
+                              onChange={(_e, value) => setSelectedSegments(value.map(segment => segment.name!))}
                               renderInput={(params) => (<TextField {...params} label="Segments"/>)}
                 />
 
@@ -93,7 +102,7 @@ const PlanetsMenu = () => {
                               options={filteredSolarSystems}
                               disableCloseOnSelect
                               limitTags={2}
-                              getOptionLabel={(option) => option.name}
+                              getOptionLabel={(option) => option.name!}
                               renderOption={(props, option, {selected}) => {
                                   const {key, ...optionProps} = props;
                                   return (
@@ -109,7 +118,7 @@ const PlanetsMenu = () => {
                                   )
                               }}
                               style={{width: 325}}
-                              onChange={(_e, value) => setSelectedSolarSystems(value.map(solarSystem => solarSystem.name))}
+                              onChange={(_e, value) => setSelectedSolarSystems(value.map(solarSystem => solarSystem.name!))}
                               renderInput={(params) => (<TextField {...params} label="Solar Systems"/>)}
                 />
                 <Button disabled variant="outlined" startIcon={<SearchIcon/>}>Advanced Filter (Coming soon)</Button>
@@ -117,7 +126,10 @@ const PlanetsMenu = () => {
             <Divider/>
             <Grid container spacing={2}>
                 {filteredPlanets.map(planet => (
-                    <EntityCard entity={planet} key={planet.name}/>
+                    <EntityCard entity={planet} key={planet.id}
+                                solarSystemName={getSolarSystemById(solarSystems, planet.solarSystemId!)?.name ?? ""}
+                                segmentName={getSegmentBySolarSystemId(segments, solarSystems, planet.solarSystemId!)?.name ?? ""}
+                    />
                 ))}
             </Grid>
         </Stack>
