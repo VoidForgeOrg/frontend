@@ -8,13 +8,11 @@ import useSegmentStore from "../../stores/segmentsStore.ts";
 import useSolarSystemStore from "../../stores/solarSystemStore.ts";
 import {useUniverseHelpers} from "../../utils/universeHelpers.ts";
 import PlanetsFilterToolbar from "./PlanetsFilterToolbar.tsx";
+import {useAuth} from "react-oidc-context";
 
-interface PlanetsMenuProps {
-    playerSub: string;
-}
+const PlanetsMenu = () => {
 
-const PlanetsMenu = (props: PlanetsMenuProps) => {
-
+    const auth = useAuth();
     const universeHelpers = useUniverseHelpers();
     const fetchEntities = useEntityStore(state => state.fetchEntities);
 
@@ -27,8 +25,12 @@ const PlanetsMenu = (props: PlanetsMenuProps) => {
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
 
     useEffect(() => {
-        fetchEntities("");
-    }, [fetchEntities, props.playerSub]);
+        if (auth.user?.profile.sub || false) {
+            fetchEntities(auth.user.profile.sub);
+        } else {
+            fetchEntities("");
+        }
+    }, [auth.user?.profile.sub, fetchEntities]);
 
     const filteredPlanets = useMemo(() =>
             universeHelpers.filterEntitiesByLocation(
