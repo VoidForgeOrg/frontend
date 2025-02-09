@@ -1,4 +1,4 @@
-import {Divider, Stack} from "@mui/material";
+import {Divider, Skeleton, Stack} from "@mui/material";
 import Grid from "@mui/material/Grid2"
 import EntityCard from "./planetCard/EntityCard.tsx";
 import {useEffect, useMemo, useState} from "react";
@@ -23,13 +23,21 @@ const PlanetsMenu = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (auth.user?.profile.sub || false) {
-            fetchEntities(auth.user.profile.sub);
-        } else {
-            fetchEntities("");
-        }
+        const loadEntities = async () => {
+            try {
+                const userId = auth.user?.profile.sub || "";
+                await fetchEntities(userId);
+                // await new Promise(resolve => setTimeout(resolve, 5000));
+            } catch (error) {
+                console.error("Error fetching entities:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadEntities();
     }, [auth.user?.profile.sub, fetchEntities]);
 
     const filteredPlanets = useMemo(() =>
@@ -50,7 +58,6 @@ const PlanetsMenu = () => {
             }),
         [solarSystems, selectedSegments, universeHelpers]
     );
-
     return (
         <Stack spacing={2}>
             <PlanetsFilterToolbar
@@ -65,9 +72,20 @@ const PlanetsMenu = () => {
             />
             <Divider/>
             <Grid container spacing={2}>
-                {filteredPlanets.map(planet => (
-                    <EntityCard entity={planet} key={planet.id}/>
-                ))}
+                {isLoading
+                    ?
+                    Array.from({ length: 10 }).map((_, index) => (
+                        <Skeleton
+                            key={index}
+                            variant="rectangular"
+                            width={240}
+                            height={270}
+                        />
+                    ))
+                    :
+                    filteredPlanets.map(planet => (
+                        <EntityCard entity={planet} key={planet.id} />
+                    ))}
             </Grid>
         </Stack>
     )
