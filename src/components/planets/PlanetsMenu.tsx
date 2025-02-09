@@ -23,19 +23,12 @@ const PlanetsMenu = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const isLoading = useEntityStore((state) => state.loading);
 
     useEffect(() => {
         const loadEntities = async () => {
-            try {
-                const userId = auth.user?.profile.sub || "";
-                await fetchEntities(userId);
-                // await new Promise(resolve => setTimeout(resolve, 5000));
-            } catch (error) {
-                console.error("Error fetching entities:", error);
-            } finally {
-                setIsLoading(false);
-            }
+            const userId = auth.user?.profile.sub || "";
+            await fetchEntities(userId);
         };
         loadEntities();
     }, [auth.user?.profile.sub, fetchEntities]);
@@ -74,7 +67,7 @@ const PlanetsMenu = () => {
             <Grid container spacing={2}>
                 {isLoading
                     ?
-                    Array.from({ length: 10 }).map((_, index) => (
+                    Array.from({length: 10}).map((_, index) => (
                         <Skeleton
                             key={index}
                             variant="rectangular"
@@ -84,7 +77,7 @@ const PlanetsMenu = () => {
                     ))
                     :
                     filteredPlanets.map(planet => (
-                        <EntityCard entity={planet} key={planet.id} />
+                        <EntityCard entity={planet} key={planet.id}/>
                     ))}
             </Grid>
         </Stack>
