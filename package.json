@@ -12,12 +12,13 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hey-api/client-axios": "^0.5.3",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.4.2",
-    "react-oidc-context": "^3.2.0",
+    "@mui/x-data-grid": "^7.25.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@hey-api/client-axios": "^0.5.3",
+    "react-oidc-context": "^3.2.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
