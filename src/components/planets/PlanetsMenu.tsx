@@ -3,12 +3,10 @@ import Grid from "@mui/material/Grid2"
 import EntityCard from "./planetCard/EntityCard.tsx";
 import {useEffect, useMemo, useState} from "react";
 
-import useEntityStore from "../../stores/entityStore.ts";
-import useSegmentStore from "../../stores/segmentsStore.ts";
-import useSolarSystemStore from "../../stores/solarSystemStore.ts";
-import {useUniverseHelpers} from "../../utils/universeHelpers.ts";
+import {useUniverseHelpers} from "../../utils";
 import PlanetsFilterToolbar from "./PlanetsFilterToolbar.tsx";
 import {useAuth} from "react-oidc-context";
+import {useEntityStore, useSegmentStore, useSolarSystemStore} from "../../stores";
 
 const PlanetsMenu = () => {
 
@@ -25,7 +23,7 @@ const PlanetsMenu = () => {
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
 
     useEffect(() => {
-        if (auth.user?.profile.sub || false) {
+        if (auth.user?.profile.sub) {
             fetchEntities(auth.user.profile.sub);
         } else {
             fetchEntities("");

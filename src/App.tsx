@@ -5,7 +5,7 @@ import {
     ThemeProvider,
     Toolbar,
 } from "@mui/material";
-import PlanetsMenu from "./components/planets/PlanetsMenu.tsx";
+import { MenuBar, PlanetsMenu, TopBar } from "./components";
 import PublicIcon from '@mui/icons-material/Public';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -13,9 +13,7 @@ import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import {useAuth} from "react-oidc-context";
 import * as React from "react";
 import ComingSoon from "./components/welcome/ComingSoon.tsx";
-import TopBar from "./components/TopBar.tsx";
-import MenuBar from "./components/MenuBar.tsx";
-import useGeneralStore from "./stores/generalStore.ts";
+import {useGeneralStore} from "./stores";
 
 const darkTheme = createTheme({
     palette: {

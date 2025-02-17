@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
-import {Entity, Segment, SolarSystem} from "../clients/universe";
-import useSegmentStore from '../stores/segmentsStore';
+import {Entity, Segment, SolarSystem} from "@voidforgeorg/universe-client";
+import useSegmentStore from '../stores/segmentStore.ts';
 import useSolarSystemStore from '../stores/solarSystemStore';
 
 type EntityLocation = {

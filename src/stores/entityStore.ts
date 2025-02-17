@@ -1,7 +1,6 @@
 import {create} from 'zustand';
-import {Entity} from "../clients/universe";
-import useSolarSystemStore from "./solarSystemStore.ts";
-import {useClientStore} from "./clientStore.ts";
+import {Configuration, Entity, EntityApi} from "@voidforgeorg/universe-client";
+import {useSolarSystemStore} from "./index.ts";
 
 interface EntityState {
     entities: Entity[];
@@ -12,16 +11,34 @@ interface EntityState {
 const useEntityStore = create<EntityState>((set) => ({
     entities: [],
     fetchEntities: async (userId) => {
+        const configuration = new Configuration({
+            basePath: "http://localhost:40000"
+        })
+        const client = new EntityApi(configuration);
         console.log("Fetching entities for user: " + userId);
-        const client = useClientStore.getState().client;
-        const response = await client.entity.entityGetEntities(undefined, undefined,
-            undefined, userId);
-        const entities = response.items || [];
-        const solarSystemStore = useSolarSystemStore.getState();
-        for (const entity of entities) {
-            solarSystemStore.fetchSolarSystem(entity.solarSystemId!);
+        let hasMore = true;
+        let page = 0;
+        while (hasMore) {
+            const response = await client.entityGetEntities({
+                xPagination: {page: page},
+                ownedByPlayerId: userId
+            });
+            const entitiesPaged = response.data || [];
+            const entities = entitiesPaged.items || [];
+            for (const entity of entities) {
+                const solarSystemStore = useSolarSystemStore.getState();
+                solarSystemStore.fetchSolarSystem(entity.solarSystemId!);
+            }
+            set((state) => {
+                return {
+                    entities: [...state.entities, ...entities]
+                }
+            })
+            hasMore = entitiesPaged.pagingMetadata
+                && entitiesPaged.pagingMetadata
+                && entitiesPaged.pagingMetadata.hasNext || false;
+            page++;
         }
-        set({entities: entities});
     }
 }))
 
