@@ -13,7 +13,7 @@ const useSolarSystemStore = create<SolarSystemState>((set) => ({
     fetchSolarSystem: async (gid: string) => {
         console.log("Fetching solar system: " + gid);
         const configuration = new Configuration({
-            basePath: "http://localhost:40000"
+            basePath: `${import.meta.env.VITE_UNIVERSE_CLIENT_HOST}:${import.meta.env.VITE_UNIVERSE_CLIENT_PORT}`
         })
         const client = new SolarSystemApi(configuration);
         const solarSystemAxiosResponse = await client.solarSystemGetSolarSystem({id: gid});

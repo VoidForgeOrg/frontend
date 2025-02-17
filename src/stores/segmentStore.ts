@@ -11,7 +11,7 @@ const useSegmentStore = create<SegmentState>((set) => ({
     fetchSegment: async (id: string) => {
         console.log("Fetching segment: " + id);
         const configuration = new Configuration({
-            basePath: "http://localhost:40000"
+            basePath: `${import.meta.env.VITE_UNIVERSE_CLIENT_HOST}:${import.meta.env.VITE_UNIVERSE_CLIENT_PORT}`
         })
         const client = new SegmentApi(configuration);
         const segmentResponse = await client.segmentGetSegment({id});

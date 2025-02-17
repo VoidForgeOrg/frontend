@@ -12,7 +12,7 @@ const useEntityStore = create<EntityState>((set) => ({
     entities: [],
     fetchEntities: async (userId) => {
         const configuration = new Configuration({
-            basePath: "http://localhost:40000"
+            basePath: `${import.meta.env.VITE_UNIVERSE_CLIENT_HOST}:${import.meta.env.VITE_UNIVERSE_CLIENT_PORT}`
         })
         const client = new EntityApi(configuration);
         console.log("Fetching entities for user: " + userId);
