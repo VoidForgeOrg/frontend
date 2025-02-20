@@ -1,7 +1,8 @@
 import {Card, CardActionArea, CardContent, CardMedia, Typography} from "@mui/material";
 import planetImage from "./planet.jpg";
-import {Entity} from "../../../clients/universe";
-import {useUniverseHelpers} from "../../../utils/universeHelpers.ts";
+import {useUniverseHelpers} from "../../../utils";
+import {Entity} from "@voidforgeorg/universe-client";
+import {ENTITY_CARD_HEIGHT, ENTITY_CARD_WIDTH} from "./EntityCardSizes.ts";
 
 type EntityCardProps = {
     entity: Entity;
@@ -13,10 +14,10 @@ const EntityCard = (props: EntityCardProps) => {
     const {solarSystem, segment} = universeHelpers.getEntityLocation(props.entity);
 
     return (
-        <Card sx={{width: 245}}>
+        <Card sx={{width: ENTITY_CARD_WIDTH}}>
             <CardActionArea>
                 <CardMedia
-                    sx={{height: 140}}
+                    sx={{height: ENTITY_CARD_HEIGHT}}
                     image={planetImage}
                 />
                 <CardContent>
@@ -35,4 +36,4 @@ const EntityCard = (props: EntityCardProps) => {
     )
 }
 
-export default EntityCard
+export default EntityCard;

@@ -1,6 +1,7 @@
 import {create} from 'zustand';
-import {Configuration, SolarSystem, SolarSystemApi} from "@voidforgeorg/universe-client";
-import {useSegmentStore} from "./index.ts";
+import {SolarSystem} from "@voidforgeorg/universe-client";
+import UniverseClient from "../services/universeService.ts";
+import useSegmentStore from "./segmentStore.ts";
 
 interface SolarSystemState {
     solarSystems: SolarSystem[];
@@ -12,10 +13,7 @@ const useSolarSystemStore = create<SolarSystemState>((set) => ({
     solarSystemMap: new Map(),
     fetchSolarSystem: async (gid: string) => {
         console.log("Fetching solar system: " + gid);
-        const configuration = new Configuration({
-            basePath: `${import.meta.env.VITE_UNIVERSE_CLIENT_HOST}:${import.meta.env.VITE_UNIVERSE_CLIENT_PORT}`
-        })
-        const client = new SolarSystemApi(configuration);
+        const client = UniverseClient.getInstance().getSolarSystemApi();
         const solarSystemAxiosResponse = await client.solarSystemGetSolarSystem({id: gid});
         const solarSystem = solarSystemAxiosResponse.data;
         const segmentStore = useSegmentStore.getState();

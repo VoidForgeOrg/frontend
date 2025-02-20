@@ -1,5 +1,6 @@
 import {create} from 'zustand';
-import {Configuration, Segment, SegmentApi} from "@voidforgeorg/universe-client";
+import {Segment} from "@voidforgeorg/universe-client";
+import UniverseClient from "../services/universeService.ts";
 
 interface SegmentState {
     segments: Segment[];
@@ -10,11 +11,8 @@ const useSegmentStore = create<SegmentState>((set) => ({
     segments: [],
     fetchSegment: async (id: string) => {
         console.log("Fetching segment: " + id);
-        const configuration = new Configuration({
-            basePath: `${import.meta.env.VITE_UNIVERSE_CLIENT_HOST}:${import.meta.env.VITE_UNIVERSE_CLIENT_PORT}`
-        })
-        const client = new SegmentApi(configuration);
-        const segmentResponse = await client.segmentGetSegment({id});
+        const api = UniverseClient.getInstance().getSegmentApi();
+        const segmentResponse = await api.segmentGetSegment({id});
         const segment = segmentResponse.data;
 
         set((state) => {

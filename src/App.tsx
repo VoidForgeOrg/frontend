@@ -1,8 +1,7 @@
 import './App.css'
 import {
     Box,
-    createTheme, CssBaseline,
-    ThemeProvider,
+    CssBaseline,
     Toolbar,
 } from "@mui/material";
 import { MenuBar, PlanetsMenu, TopBar } from "./components";
@@ -14,12 +13,6 @@ import {useAuth} from "react-oidc-context";
 import * as React from "react";
 import ComingSoon from "./components/welcome/ComingSoon.tsx";
 import {useGeneralStore} from "./stores";
-
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-    },
-});
 
 type menuItem = {
     name: string,
@@ -38,7 +31,6 @@ function App() {
 
     const auth = useAuth();
     const selectedIndex = useGeneralStore(state => state.selectedMenuItemIndex);
-
 
     switch (auth.activeNavigator) {
         case "signinSilent":
@@ -63,8 +55,6 @@ function App() {
     console.log(auth.user?.profile.sub)
 
     return (
-        <ThemeProvider theme={darkTheme}>
-
             <Box sx={{display: 'flex', minHeight: '100vh'}}>
                 <CssBaseline/>
                 <TopBar/>
@@ -77,9 +67,6 @@ function App() {
                     {selectedIndex === 3 && <ComingSoon/>}
                 </Box>
             </Box>
-
-
-        </ThemeProvider>
     )
 }
 

@@ -1,20 +1,25 @@
-import {Divider, Stack} from "@mui/material";
-import Grid from "@mui/material/Grid2"
+import {Divider, Stack, CircularProgress, Typography, Skeleton} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import EntityCard from "./planetCard/EntityCard.tsx";
-import {useEffect, useMemo, useState} from "react";
-
-import {useUniverseHelpers} from "../../utils";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { useUniverseHelpers } from "../../utils";
 import PlanetsFilterToolbar from "./PlanetsFilterToolbar.tsx";
-import {useAuth} from "react-oidc-context";
-import {useEntityStore, useSegmentStore, useSolarSystemStore} from "../../stores";
+import { useAuth } from "react-oidc-context";
+import { useEntityStore, useSegmentStore, useSolarSystemStore } from "../../stores";
+import {ENTITY_CARD_HEIGHT, ENTITY_CARD_WIDTH} from "./planetCard/EntityCardSizes.ts";
 
 const PlanetsMenu = () => {
-
     const auth = useAuth();
     const universeHelpers = useUniverseHelpers();
-    const fetchEntities = useEntityStore(state => state.fetchEntities);
 
-    const planets = useEntityStore(state => state.entities);
+    const {
+        entities: planets,
+        fetchEntities,
+        isLoading,
+        error,
+        clearEntities
+    } = useEntityStore();
+
     const segments = useSegmentStore(state => state.segments);
     const solarSystems = useSolarSystemStore(state => state.solarSystems);
 
@@ -22,13 +27,24 @@ const PlanetsMenu = () => {
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
     const [selectedSolarSystems, setSelectedSolarSystems] = useState<string[]>([]);
 
-    useEffect(() => {
-        if (auth.user?.profile.sub) {
-            fetchEntities(auth.user.profile.sub);
-        } else {
-            fetchEntities("");
+    const loadEntities = useCallback(async () => {
+        const userId = auth.user?.profile.sub || "undefined";
+        try {
+            await fetchEntities(userId);
+        } catch (err) {
+            console.error("Failed to load entities:", err);
         }
-    }, [auth.user?.profile.sub, fetchEntities]);
+    }, [fetchEntities, auth.user?.profile.sub]);
+
+    useEffect(() => {
+        (async () => {
+            await loadEntities();
+        })();
+
+        return () => {
+            clearEntities();
+        };
+    }, [loadEntities, clearEntities]);
 
     const filteredPlanets = useMemo(() =>
             universeHelpers.filterEntitiesByLocation(
@@ -49,6 +65,25 @@ const PlanetsMenu = () => {
         [solarSystems, selectedSegments, universeHelpers]
     );
 
+    if (isLoading && planets.length === 0) {
+        return (
+            <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ minHeight: 400 }}>
+                <CircularProgress />
+                <Typography>Loading planets...</Typography>
+            </Stack>
+        );
+    }
+
+    if (error && planets.length === 0) {
+        return (
+            <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ minHeight: 400 }}>
+                <Typography color="error">
+                    Failed to load planets: {error}
+                </Typography>
+            </Stack>
+        );
+    }
+
     return (
         <Stack spacing={2}>
             <PlanetsFilterToolbar
@@ -62,14 +97,37 @@ const PlanetsMenu = () => {
                 solarSystems={filteredSolarSystems}
             />
             <Divider/>
-            <Grid container spacing={2}>
-                {filteredPlanets.map(planet => (
-                    <EntityCard entity={planet} key={planet.id}/>
-                ))}
-            </Grid>
+            {filteredPlanets.length === 0 ? (
+                    searchTerm !== "" || selectedSegments.length > 0 || selectedSolarSystems.length > 0 ? (
+                        <Typography align="center" sx={{ py: 4 }}>
+                            No planets match the current filters
+                        </Typography>
+                    ) : (
+                        <Typography align="center" sx={{ py: 4 }}>
+                            No planets found
+                        </Typography>
+                    )
+
+            ) : (
+                <Grid container spacing={2}>
+                    {isLoading
+                        ?
+                        Array.from({length: 10}).map((_, index) => (
+                            <Skeleton
+                                key={index}
+                                variant="rectangular"
+                                width={ENTITY_CARD_WIDTH}
+                                height={ENTITY_CARD_HEIGHT}
+                            />
+                        ))
+                        :
+                        filteredPlanets.map(planet => (
+                            <EntityCard entity={planet} key={planet.id}/>
+                        ))}
+                </Grid>
+            )}
         </Stack>
-    )
-}
+    );
+};
 
-
-export default PlanetsMenu
+export default PlanetsMenu;
