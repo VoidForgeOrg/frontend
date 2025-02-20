@@ -1,35 +1,73 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import {
+    Box,
+    CssBaseline,
+    Toolbar,
+} from "@mui/material";
+import { MenuBar, PlanetsMenu, TopBar } from "./components";
+import PublicIcon from '@mui/icons-material/Public';
+import BiotechIcon from '@mui/icons-material/Biotech';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
+import {useAuth} from "react-oidc-context";
+import * as React from "react";
+import ComingSoon from "./components/welcome/ComingSoon.tsx";
+import {useGeneralStore} from "./stores";
+
+type menuItem = {
+    name: string,
+    icon: React.ElementType,
+}
+
+const menuItems: menuItem[] = [
+    {name: "Planets", icon: PublicIcon},
+    {name: "Research", icon: BiotechIcon},
+    {name: "Fleet", icon: RocketLaunchIcon},
+    {name: "Exploration", icon: SatelliteAltIcon},
+]
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const auth = useAuth();
+    const selectedIndex = useGeneralStore(state => state.selectedMenuItemIndex);
+
+    switch (auth.activeNavigator) {
+        case "signinSilent":
+            return <div>Signing you in...</div>;
+        case "signoutRedirect":
+            return <div>Signing you out...</div>;
+    }
+
+    if (auth.isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (auth.error) {
+        return <div>Oops... {auth.error.message}</div>;
+    }
+
+
+    if (!auth.isAuthenticated) {
+        return <button onClick={() => void auth.signinRedirect()}>Log in</button>
+    }
+
+    console.log(auth.user?.profile.sub)
+
+    return (
+            <Box sx={{display: 'flex', minHeight: '100vh'}}>
+                <CssBaseline/>
+                <TopBar/>
+                <MenuBar menuItems={menuItems}/>
+                <Box component="main" sx={{flexGrow: 1, p: 3}}>
+                    <Toolbar/>
+                    {selectedIndex === 0 && <PlanetsMenu/>}
+                    {selectedIndex === 1 && <ComingSoon/>}
+                    {selectedIndex === 2 && <ComingSoon/>}
+                    {selectedIndex === 3 && <ComingSoon/>}
+                </Box>
+            </Box>
+    )
 }
 
 export default App
